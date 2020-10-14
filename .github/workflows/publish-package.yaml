@@ -1,0 +1,46 @@
+name: Publish package
+
+on:
+  push:
+    branches-ignore:
+      - master
+      - sandbox
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - run: echo ::set-env name=REPOSITORY_NAME::$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//")
+
+    - uses: actions/checkout@v2
+      with:
+        path: main
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+
+    - name: Build artifact
+      run: cd main && mvn clean package -Dmaven.javadoc.skip=true --no-transfer-progress -s .github/workflows/settings.xml
+      env:
+        NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+        NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GIT_USERNAME: mikeacjones
+
+    - name: Deploy artifact
+      run: cd main && mvn deploy:deploy-file@github-deploy --no-transfer-progress -s .github/workflows/settings.xml
+      env:
+        NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+        NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GIT_USERNAME: mikeacjones
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: mule-artifact
+        path: main/target/*.jar
