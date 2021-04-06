@@ -15,8 +15,6 @@ jobs:
 
     steps:
 
-    - run: echo ::set-env name=REPOSITORY_NAME::$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//")
-
     - uses: actions/checkout@v2
       with:
         path: main
