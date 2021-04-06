@@ -7,7 +7,7 @@
   <groupId>net.mikej.objectstore</groupId>
   <artifactId>mongodb-object-store</artifactId>
   <packaging>mule-extension</packaging>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <name>mongodb-object-store</name>
 
   <properties>
